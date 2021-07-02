@@ -22,17 +22,19 @@ module.exports.postRecognition =(req,res,next) => {
     Recognition.find().then(async (rects)=> {
         let check = false;
         for(let i of rects){
-            if(i.label === req.body.label){
+            if(i.label === req.body.label && i.ChannelName === req.body.ChannelName ){
                 check = true;
                 break;
             }
         }
-        if(check === false){
+        if(check === false && req.body.faceDetects.length !==0){
             var Rect = await Recognition.create(req.body);
             res.json(Rect); 
-        } else {
-            var Rect = await Recognition.findOneAndReplace({label:req.body.label},req.body)
+        } else if(check === true && req.body.faceDetects.length !==0){
+            var Rect = await Recognition.findOneAndReplace({label:req.body.label,ChannelName:req.body.ChannelName},req.body)
             res.json(Rect); 
+        } else {
+            res.json(Rect);     
         }
     });
 };
