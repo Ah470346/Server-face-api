@@ -38,3 +38,63 @@ module.exports.postRecognition =(req,res,next) => {
         }
     });
 };
+
+module.exports.editActiveRecognition = async (req,res,next)=>{
+    const Rect = await Recognition.updateOne({label:req.body.label,ChannelName:req.body.ChannelName}, { Active: req.body.Active});
+    if(Rect){
+        Recognition.find({label:req.body.label,ChannelName:req.body.ChannelName}).then((rec)=>{
+            res.json(rec); 
+        })
+    }
+}
+
+module.exports.deleteRecognition = async (req,res,next)=>{
+    const Rect = await Recognition.updateOne({label:req.body.label,ChannelName:req.body.ChannelName}, { isDelete: req.body.isDelete});
+    res.json(Rect); 
+}
+
+module.exports.cloneRecognition =(req,res,next)=>{
+    Recognition.find({ChannelName:req.body.ToChannel}).then(async(rects)=>{
+        for(let i of req.body.label){
+            let exist = false;
+            for(let j of rects){
+                if(i === j.label && j.isDelete !== true){
+                    exist = true;
+                }
+            }
+            if(exist === false){
+                Recognition.find({label:i,ChannelName:req.body.FromChannel}).then( async (rect)=> {
+                    const Rect = await Recognition.create({faceDetects:rect[0].faceDetects,
+                                                            label:rect[0].label,
+                                                            faceID:rect[0].faceID,
+                                                            Time:rect[0].Time,
+                                                            ChannelName:req.body.ToChannel,
+                                                            Active:rect[0].Active,
+                                                            isDelete:rect[0].isDelete});
+                });
+            }
+        }
+    })
+    res.json("done");
+}
+
+module.exports.moveRecognition = (req,res,next)=>{
+    Recognition.find({ChannelName:req.body.ToChannel}).then(async(rects)=>{
+        for(let i of req.body.label){
+            let exist = false;
+            for(let j of rects){
+                if(i === j.label){
+                    exist = true;
+                }
+            }
+            if(exist === false){
+                console.log("hello");
+                const Rect = await Recognition.updateOne({label:i,ChannelName:req.body.FromChannel}, { ChannelName: req.body.ToChannel}); 
+            } else if(exist === true){
+                const Rect = await Recognition.deleteOne({label:i,ChannelName:req.body.FromChannel});
+            }
+            
+        }
+    })
+    res.json("done");
+}
