@@ -98,3 +98,9 @@ module.exports.moveRecognition = (req,res,next)=>{
     })
     res.json("done");
 }
+
+module.exports.uploadRecognition = async(req,res,next)=>{
+    const path = req.file.path.split("\\").slice(1).join("/");
+    const Rect = await Recognition.updateOne({label:req.body.name,ChannelName:req.body.ChannelName}, { image: path});
+    res.json("oke");
+}

@@ -17,7 +17,6 @@ var dir = path.join(__dirname, 'public');
 const app = express();
 const port = 8080;
 
-
 mongoose.connect(process.env.MONGO_URL,{useNewUrlParser: true, useUnifiedTopology: true});
 
 const apiRecognitionRouter = require('./api/routers/recognition.router');
@@ -103,6 +102,7 @@ const runSocket = (uri)=>{
 app.get("/", (req, res) => {
     res.send({ response: "I am alive" }).status(200);
   });
+
 
 app.post("/", (req, res) => {
     if(req.body !== undefined){

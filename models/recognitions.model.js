@@ -7,7 +7,8 @@ var recognitionsSchema = new mongoose.Schema({
     ChannelName:String,
     Time:String,
     Active:Boolean,
-    isDelete: Boolean
+    isDelete: Boolean,
+    image:String
 });
 
 var Recognition = mongoose.model('Recognition', recognitionsSchema , 'Recognitions');
